@@ -1,295 +1,117 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HR Assistant | HR System</title>
+  <title>HR Chatbot</title>
   <style>
     :root {
-      --navy: #142b4a;
-      --blue: #3168d5;
-      --bg: #f4f7fb;
-      --muted: #64748b;
-      --border: #e1e8f0;
+      --navy: #101828; --blue: #3867e8; --blue-dark: #2852c7;
+      --muted: #667085; --border: #e4e7ec;
+      --surface: #ffffff; --background: #f5f7fb;
     }
-
     * { box-sizing: border-box; }
-
     body {
-      margin: 0;
+      margin: 0; height: 100vh; display: flex; flex-direction: column;
       font-family: Inter, "Segoe UI", Arial, sans-serif;
-      background: var(--bg);
-      color: var(--navy);
-      min-height: 100vh;
+      color: var(--navy); background: var(--background);
     }
-
     header {
-      background: white;
-      border-bottom: 1px solid var(--border);
-      padding: 18px 6%;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 16px;
+      background: var(--surface); border-bottom: 1px solid var(--border);
+      padding: 16px 7%; display: flex; justify-content: space-between; align-items: center;
     }
-
-    .brand { font-weight: 800; font-size: 20px; }
-    .brand span { color: var(--blue); }
-    header a { color: var(--blue); text-decoration: none; font-weight: 600; }
-
-    main {
-      width: min(850px, 92%);
-      margin: 48px auto;
-    }
-
-    .intro { text-align: center; margin-bottom: 28px; }
-    .pill {
-      display: inline-block;
-      background: #e3edff;
-      color: #2453a6;
-      border-radius: 20px;
-      padding: 7px 12px;
-      font-size: 12px;
-      font-weight: 700;
-    }
-
-    h1 { font-size: clamp(28px, 5vw, 40px); margin: 16px 0 10px; }
-    .intro p { color: var(--muted); line-height: 1.7; }
-
-    .chat-card {
-      background: white;
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      overflow: hidden;
-      box-shadow: 0 12px 35px #142b4a0d;
-    }
-
-    .chat-header {
-      padding: 20px 24px;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .avatar {
-      width: 44px;
-      height: 44px;
-      border-radius: 14px;
-      background: #e3edff;
-      display: grid;
-      place-items: center;
-      font-size: 23px;
-    }
-
-    .chat-header p { margin: 5px 0 0; color: var(--muted); font-size: 13px; }
-    .messages { padding: 24px; min-height: 230px; }
-    .message {
-      max-width: 90%;
-      padding: 14px 16px;
-      margin-bottom: 16px;
-      border-radius: 14px;
-      line-height: 1.65;
-      white-space: pre-wrap;
-      overflow-wrap: anywhere;
-    }
-
-    .bot { background: #f0f4fa; border: 1px solid var(--border); }
-    .user { background: var(--blue); color: white; margin-left: auto; }
-    .sources { font-size: 12px; color: var(--muted); margin-top: 8px; }
-
-    .suggestions { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 24px 18px; }
-    .suggestions button {
-      border: 1px solid var(--border);
-      background: white;
-      color: var(--navy);
-      border-radius: 20px;
-      padding: 9px 12px;
-      cursor: pointer;
-    }
-    .suggestions button:hover { border-color: var(--blue); }
-
-    form {
-      border-top: 1px solid var(--border);
-      padding: 18px;
-      display: flex;
-      gap: 10px;
-    }
-
+    .brand { display: flex; align-items: center; gap: 12px; font-size: 19px; font-weight: 700; }
+    .brand-icon { display: grid; place-items: center; width: 42px; height: 42px; background: #e9efff; color: var(--blue); border-radius: 12px; font-size: 22px; }
+    .back { color: var(--blue); text-decoration: none; font-weight: 700; font-size: 14px; }
+    .back:hover { text-decoration: underline; }
+    #chat { flex: 1; overflow-y: auto; width: min(820px, 92%); margin: 0 auto; padding: 28px 0; display: flex; flex-direction: column; gap: 14px; }
+    .msg { max-width: 80%; padding: 13px 16px; border-radius: 16px; line-height: 1.6; font-size: 15px; white-space: pre-wrap; word-wrap: break-word; }
+    .bot { align-self: flex-start; background: var(--surface); border: 1px solid var(--border); border-bottom-left-radius: 4px; }
+    .user { align-self: flex-end; background: var(--blue); color: #fff; border-bottom-right-radius: 4px; }
+    .error { color: #b42318; background: #fef3f2; border-color: #fecdca; }
+    form { background: var(--surface); border-top: 1px solid var(--border); padding: 16px 0; }
+    .row { width: min(820px, 92%); margin: 0 auto; display: flex; gap: 10px; }
     input {
-      flex: 1;
-      min-width: 0;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 14px;
-      font-size: 15px;
-      outline-color: var(--blue);
+      flex: 1; padding: 13px 16px; border: 1px solid var(--border); border-radius: 10px;
+      font: inherit; font-size: 15px; outline: none;
     }
-
-    form button {
-      background: var(--blue);
-      color: white;
-      border: 0;
-      border-radius: 12px;
-      padding: 0 20px;
-      font-weight: 700;
-      cursor: pointer;
+    input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px #e9efff; }
+    button {
+      padding: 0 22px; border: 0; border-radius: 10px; background: var(--blue);
+      color: #fff; font-weight: 700; font-size: 14px; cursor: pointer;
     }
-
-    form button:disabled { opacity: .6; cursor: wait; }
-    .status { color: var(--muted); font-size: 13px; padding: 0 24px 16px; }
-    footer { text-align: center; color: var(--muted); font-size: 12px; padding: 20px; }
-
-    @media (max-width: 520px) {
-      main { margin: 28px auto; }
-      form { padding: 12px; }
-      form button { padding: 0 13px; }
-      .messages { padding: 16px; }
-      .suggestions { padding: 0 16px 16px; }
-    }
+    button:hover { background: var(--blue-dark); }
+    button:disabled { opacity: .6; cursor: default; }
   </style>
 </head>
 <body>
   <header>
-    <div class="brand">HR <span>System</span></div>
-    <a href="../index.html">← Back to Portal</a>
+    <div class="brand"><div class="brand-icon" aria-hidden="true">💬</div><span>HR Chatbot</span></div>
+    <a class="back" href="../">← Back to portal</a>
   </header>
 
-  <main>
-    <section class="intro">
-      <span class="pill">AI-POWERED HR SUPPORT</span>
-      <h1>Your HR Assistant</h1>
-      <p>Ask questions about employee policies and the information in the HR handbook.</p>
-    </section>
+  <div id="chat" aria-live="polite">
+    <div class="msg bot">Hello! I'm your HR assistant. Ask me anything about HR policies or the employee handbook.</div>
+  </div>
 
-    <section class="chat-card">
-      <div class="chat-header">
-        <div class="avatar">✦</div>
-        <div>
-          <strong>HR Policy Assistant</strong>
-          <p>Answers based on the connected employee handbook</p>
-        </div>
-      </div>
-
-      <div class="messages" id="messages" aria-live="polite">
-        <div class="message bot">
-          Hello! I'm your HR assistant. Ask me a question about the employee handbook.
-        </div>
-      </div>
-
-      <div class="suggestions">
-        <button type="button" data-question="What is the annual leave policy?">Annual leave</button>
-        <button type="button" data-question="What are the working hours?">Working hours</button>
-        <button type="button" data-question="How can I contact HR?">Contact HR</button>
-      </div>
-
-      <form id="chatForm">
-        <input id="question" name="question"
-          placeholder="Ask an HR question..." autocomplete="off" required>
-        <button id="sendButton" type="submit">Send ↗</button>
-      </form>
-      <div class="status" id="status">Please avoid sharing passwords or sensitive personal information.</div>
-    </section>
-  </main>
-
-  <footer>HR System Portal · For employee policy guidance</footer>
+  <form id="form">
+    <div class="row">
+      <input id="input" type="text" placeholder="Type your question..." autocomplete="off" required>
+      <button id="send" type="submit">Send</button>
+    </div>
+  </form>
 
   <script>
-    const WEBHOOK_URL =
-      "https://faro7a06.app.n8n.cloud/webhook/3de3be36-78a9-491b-86db-759255690b6c";
+    // PASTE the chat URL from your n8n Chat Trigger / Webhook node (Production URL).
+    const WEBHOOK_URL = "PASTE_YOUR_N8N_CHAT_WEBHOOK_URL_HERE";
 
-    const form = document.getElementById("chatForm");
-    const input = document.getElementById("question");
-    const messages = document.getElementById("messages");
-    const status = document.getElementById("status");
-    const sendButton = document.getElementById("sendButton");
+    const chat = document.getElementById("chat");
+    const form = document.getElementById("form");
+    const input = document.getElementById("input");
+    const send = document.getElementById("send");
+    const sessionId = (crypto.randomUUID && crypto.randomUUID()) || String(Date.now());
 
-    function addMessage(text, type, sources) {
-      const bubble = document.createElement("div");
-      bubble.className = "message " + type;
-      bubble.textContent = text;
-      messages.appendChild(bubble);
-
-      if (sources && sources.length) {
-        const sourceBox = document.createElement("div");
-        sourceBox.className = "sources";
-        sourceBox.textContent = "Sources: " +
-          sources.map(source =>
-            typeof source === "string" ? source : JSON.stringify(source)
-          ).join(", ");
-        bubble.appendChild(document.createElement("br"));
-        bubble.appendChild(sourceBox);
-      }
-
-      messages.scrollTop = messages.scrollHeight;
-      bubble.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    function addMessage(text, cls) {
+      const div = document.createElement("div");
+      div.className = "msg " + cls;
+      div.textContent = text;
+      chat.appendChild(div);
+      chat.scrollTop = chat.scrollHeight;
+      return div;
     }
 
-    async function askHR(question) {
-      addMessage(question, "user");
-      status.textContent = "Thinking…";
-      sendButton.disabled = true;
-      input.disabled = true;
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const text = input.value.trim();
+      if (!text) return;
+      addMessage(text, "user");
+      input.value = "";
+      send.disabled = true;
+      const typing = addMessage("Thinking...", "bot");
 
       try {
-        const response = await fetch(WEBHOOK_URL, {
+        const res = await fetch(WEBHOOK_URL, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ question })
+          body: JSON.stringify({ action: "sendMessage", sessionId, chatInput: text })
         });
-
-        const raw = await response.text();
-
-        if (!response.ok) {
-          throw new Error("Request failed (HTTP " + response.status + ").");
-        }
-
-        let data;
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        const raw = await res.text();
+        let reply = raw;
         try {
-          data = JSON.parse(raw);
-        } catch {
-          throw new Error("The workflow returned an unexpected response.");
-        }
-
-        // Supports the current workflow's { answer, sources } response.
-        if (typeof data === "string") {
-          try { data = JSON.parse(data); } catch {}
-        }
-
-        const answer = data.answer || data.output || data.text ||
-          "The workflow returned no answer. Please try again.";
-
-        addMessage(String(answer), "bot", Array.isArray(data.sources) ? data.sources : []);
-        status.textContent = "Response received.";
-      } catch (error) {
-        addMessage(
-          "Sorry, I couldn't connect to the HR assistant. Please try again. If the issue continues, contact HR.",
-          "bot"
-        );
-        status.textContent =
-          "Connection error: " + error.message +
-          " Check the webhook's CORS settings and n8n execution log.";
+          const data = JSON.parse(raw);
+          const d = Array.isArray(data) ? data[0] : data;
+          reply = d.output || d.text || d.message || d.answer || JSON.stringify(d);
+        } catch (_) {}
+        typing.textContent = reply;
+      } catch (err) {
+        typing.textContent = "Sorry, I couldn't reach the HR assistant. Please try again. (" + err.message + ")";
+        typing.classList.add("error");
       } finally {
-        sendButton.disabled = false;
-        input.disabled = false;
+        send.disabled = false;
         input.focus();
+        chat.scrollTop = chat.scrollHeight;
       }
-    }
-
-    form.addEventListener("submit", event => {
-      event.preventDefault();
-      const question = input.value.trim();
-      if (!question) return;
-      input.value = "";
-      askHR(question);
-    });
-
-    document.querySelectorAll("[data-question]").forEach(button => {
-      button.addEventListener("click", () => {
-        if (sendButton.disabled) return;
-        askHR(button.dataset.question);
-      });
     });
   </script>
 </body>

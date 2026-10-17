@@ -93,7 +93,9 @@
         const res = await fetch(WEBHOOK_URL, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ action: "sendMessage", sessionId, chatInput: text })
+         body: JSON.stringify({
+  question: text
+})
         });
         if (!res.ok) throw new Error("HTTP " + res.status);
         const raw = await res.text();
